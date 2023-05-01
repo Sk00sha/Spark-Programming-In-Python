@@ -16,14 +16,13 @@ if __name__ == "__main__":
         .config(conf=conf) \
         .getOrCreate()
 
-    sc = spark.sparkContext
+    surveydata = spark.read\
+        .option("header", "true") \
+        .option("inferSchema", "true") \
+        .csv("data/sample.csv")
 
-    rdd = sc.textFile(sys.argv[1])
+    surveydata.createOrReplaceTempView("survey_tbl")
 
-    repartition = rdd.repartition(2)
+    counts = spark.sql("select Country, count(1) as count from survey_tbl where Age<40 group by Country")
 
-    cols = repartition.map(lambda line: line.replace('"', '').split(","))
-
-    selectedRdd = cols.map(lambda columns: SurveyRecord(int(columns[1]), int(columns[2]), int(columns[3]), int(columns[4])))
-
-    
+    counts.show()
