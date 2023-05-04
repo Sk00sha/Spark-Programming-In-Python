@@ -23,10 +23,13 @@ if __name__ == "__main__":
                   f.countDistinct("InvoiceNo").alias("Count distinct invoices")) \
         .show()
 
-    def_df.groupBy("StockCode") \
-        .agg(f.count("*").alias("Unit count"), f.avg("UnitPrice").alias("Average unit price")).dropDuplicates().show()
+    def_df.groupBy("Country") \
+        .agg(f.count("*").alias("NumInvoices")
+             , f.sum("Quantity").alias("TotalQuantity")
+             , f.sum("UnitPrice").alias("InvoiceValue")
+             ).dropDuplicates().show()
 
-    def_df.createOrReplaceTempView("invoice_table")
+    #def_df.createOrReplaceTempView("invoice_table")
 
-    spark.sql("SELECT StockCode,COUNT(*) as `Count of stock codes`,AVG(UnitPrice) as `Average unit Price` FROM "
-              "invoice_table GROUP BY StockCode").show()
+    #spark.sql("SELECT StockCode,COUNT(*) as `Count of stock codes`,AVG(UnitPrice) as `Average unit Price` FROM "
+    #          "invoice_table GROUP BY StockCode").show()
